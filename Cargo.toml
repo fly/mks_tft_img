@@ -1,6 +1,6 @@
 [package]
 name = "mks_tft_img"
-version = "0.0.0"
+version = "1.0.0"
 authors = ["fly"]
 repository = "https://github.com/fly/mks_tft_img"
 license = "Apache-2.0 license"
