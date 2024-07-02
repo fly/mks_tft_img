@@ -1,0 +1,15 @@
+[package]
+name = "mks_tft_img"
+version = "0.0.0"
+authors = ["fly"]
+repository = "https://github.com/fly/mks_tft_img"
+license = "Apache-2.0 license"
+categories = ["command-line-utilities"]
+edition = "2021"
+
+[dependencies]
+base64 = "0.22.1"
+clap = { version = "4.5.7", features = ["derive"] }
+image = "0.25.1"
+log = "0.4.21"
+simplelog = "0.12.2"

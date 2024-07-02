@@ -1,0 +1,56 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update_version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update Cargo.toml version
+        run: |
+          sed -i "s/^version = .*/version = \"${{ github.ref_name }}\"/" Cargo.toml
+          cargo generate-lockfile
+
+      - name: Commit and push updated Cargo.toml
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://oauth2:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git checkout main
+          git commit -am "Update version to ${{ github.ref_name }}"
+          git tag -f ${{ github.ref_name }}
+          git push origin
+          git push origin --tags --force
+
+
+
+  build_and_upload:
+    needs: update_version
+
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: mks_tft_img
+          token: ${{ secrets.GITHUB_TOKEN }}
+          archive: $bin-${{ runner.os }}
+          checksum: sha256
